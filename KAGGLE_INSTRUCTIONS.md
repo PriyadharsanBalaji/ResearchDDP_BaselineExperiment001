@@ -1,0 +1,53 @@
+# Kaggle Setup Instructions for BaselineExperiment001
+
+Since we are using heavy models like `bodhan-ai/indic-ocr` (0.8B to 1.2B params depending on the version) and `bodhan-ai/indic-translate` (4B params), it's highly recommended to run this on **Kaggle** with a GPU accelerator.
+
+## 1. Setting up the Kaggle Environment
+
+1. Log into your Kaggle account and click **Create -> New Notebook**.
+2. Under **Settings** on the right panel:
+   - Change the **Accelerator** to **GPU P100** or **GPU T4x2**.
+   - Ensure **Internet** is toggled **ON** (needed to download HuggingFace models).
+
+## 2. Clone the Repository into Kaggle
+
+In the very first cell of your Kaggle notebook, run this to clone your code:
+
+```bash
+!git clone https://github.com/PriyadharsanBalaji/ResearchDDP_BaselineExperiment001.git
+%cd ResearchDDP_BaselineExperiment001
+!pip install -r requirements.txt
+```
+
+## 3. Prepare an Indic Font (Required for Rendering)
+
+Standard environments don't have Indian language fonts installed.
+Download a font like Noto Sans Devanagari (or Tamil/Telugu, etc.) from Google Fonts. 
+
+In a new cell, run:
+```bash
+!wget "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf" -O NotoSansDevanagari.ttf
+```
+
+Make sure you update line 112 in `pipeline.py` to point to `NotoSansDevanagari.ttf` instead of `arial.ttf`.
+
+## 4. Run the Pipeline
+
+Upload a test diagram to your Kaggle workspace (e.g., `test_diagram.jpg`).
+
+Create a new cell and run the pipeline:
+
+```python
+from pipeline import LayoutPreservingTranslator
+
+# Initialize the pipeline (downloads the models to Kaggle)
+# It will use GPU automatically if available.
+translator = LayoutPreservingTranslator(target_lang="hi")
+
+# Run the full process (OCR -> Translate -> Inpaint -> Render)
+translator.process("../input/your-dataset/test_diagram.jpg", "translated_diagram.jpg")
+```
+
+## 5. Next Steps / Modifications
+
+- The `pipeline.py` script has placeholder model inference code. Once you check the exact input/output formats of the newly released `bodhan-ai/indic-ocr` and `indic-translate` models on HuggingFace, you can edit `extract_text_and_layout()` and `translate_texts()` accordingly directly in Kaggle, and commit the changes back to your GitHub repository.
