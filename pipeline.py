@@ -7,7 +7,7 @@ import torch
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 from huggingface_hub import snapshot_download
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 class LayoutPreservingTranslator:
     def __init__(self, target_lang="hi", device=None):
@@ -36,10 +36,18 @@ class LayoutPreservingTranslator:
         # 2. Load Translation Model (bodhan-ai/indic-translate)
         self.translate_model_id = "bodhan-ai/indic-translate"
         try:
+            print("Loading translation model in 4-bit quantization to save GPU memory...")
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16
+            )
             self.translator_tokenizer = AutoTokenizer.from_pretrained(self.translate_model_id, trust_remote_code=True)
             self.translator_model = AutoModelForCausalLM.from_pretrained(
-                self.translate_model_id, torch_dtype=torch.float16, trust_remote_code=True
-            ).to(self.device)
+                self.translate_model_id, 
+                quantization_config=quantization_config,
+                device_map="auto",
+                trust_remote_code=True
+            )
             print("Translation Model loaded.")
         except Exception as e:
             print(f"Failed to load Translation model: {e}")
