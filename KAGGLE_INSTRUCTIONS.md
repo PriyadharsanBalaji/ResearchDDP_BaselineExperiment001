@@ -48,6 +48,16 @@ translator = LayoutPreservingTranslator(target_lang="hi")
 translator.process("../input/your-dataset/test_diagram.jpg", "translated_diagram.jpg")
 ```
 
-## 5. Next Steps / Modifications
+## 5. Evaluate on AI2D Dataset (Large Scale Test)
+
+To test the pipeline on a sample of the AI2D dataset (educational science diagrams), create a new cell and run:
+
+```python
+!python evaluate_ai2d.py
+```
+
+This will automatically stream diagrams from HuggingFace, process them through the layout-preserving pipeline, and save the translated versions into an `ai2d_results` folder that you can view in Kaggle.
+
+## 6. Next Steps / Modifications
 
 - The `pipeline.py` script has placeholder model inference code. Once you check the exact input/output formats of the newly released `bodhan-ai/indic-ocr` and `indic-translate` models on HuggingFace, you can edit `extract_text_and_layout()` and `translate_texts()` accordingly directly in Kaggle, and commit the changes back to your GitHub repository.
