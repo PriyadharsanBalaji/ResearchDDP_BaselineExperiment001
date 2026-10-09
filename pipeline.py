@@ -17,24 +17,24 @@ class LayoutPreservingTranslator:
         print(f"Loading models on {self.device}...")
         
         # 1. Load OCR Model (bodhan-ai/indic-ocr)
-        # Note: Replace with actual classes from the Bodhan model card if different.
         self.ocr_model_id = "bodhan-ai/indic-ocr"
         try:
-            self.ocr_processor = AutoProcessor.from_pretrained(self.ocr_model_id)
+            # We must use trust_remote_code=True for brand new custom models
+            self.ocr_processor = AutoProcessor.from_pretrained(self.ocr_model_id, trust_remote_code=True)
             self.ocr_model = AutoModelForCausalLM.from_pretrained(
-                self.ocr_model_id, torch_dtype=torch.float16
+                self.ocr_model_id, torch_dtype=torch.float16, trust_remote_code=True
             ).to(self.device)
             print("OCR Model loaded.")
         except Exception as e:
             print(f"Failed to load OCR model from huggingface: {e}")
-            print("Please ensure you have accepted any necessary agreements or are logged in via `huggingface-cli login`")
             
         # 2. Load Translation Model (bodhan-ai/indic-translate)
         self.translate_model_id = "bodhan-ai/indic-translate"
         try:
-            self.translator_tokenizer = AutoTokenizer.from_pretrained(self.translate_model_id)
-            self.translator_model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.translate_model_id, torch_dtype=torch.float16
+            self.translator_tokenizer = AutoTokenizer.from_pretrained(self.translate_model_id, trust_remote_code=True)
+            # It uses Gemma4 which is a CausalLM, not a Seq2SeqLM!
+            self.translator_model = AutoModelForCausalLM.from_pretrained(
+                self.translate_model_id, torch_dtype=torch.float16, trust_remote_code=True
             ).to(self.device)
             print("Translation Model loaded.")
         except Exception as e:
