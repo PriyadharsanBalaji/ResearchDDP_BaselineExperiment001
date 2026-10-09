@@ -31,7 +31,20 @@ In a new cell, run:
 
 Make sure you update line 112 in `pipeline.py` to point to `NotoSansDevanagari.ttf` instead of `arial.ttf`.
 
-## 4. Run the Pipeline
+## 4. Authenticate with Hugging Face (CRITICAL)
+
+Because Bodhan AI's models are "gated" (you have to accept their terms on HuggingFace), you must authenticate before running the script.
+
+1. Go to [Hugging Face Settings](https://huggingface.co/settings/tokens) and create an Access Token.
+2. Ensure you have visited the Bodhan AI model pages and clicked "Agree and access repository".
+3. In Kaggle, run this cell and paste your token:
+
+```python
+from huggingface_hub import login
+login()
+```
+
+## 5. Run the Pipeline
 
 Upload a test diagram to your Kaggle workspace (e.g., `test_diagram.jpg`).
 
